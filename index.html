@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Guerra Comercial Tycoon</title>
+    <style>
+        body { background-color: #1e293b; color: #f8fafc; font-family: sans-serif; text-align: center; padding: 20px; }
+        h1 { color: #38bdf8; }
+        .tablero { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .card { background: #0f172a; padding: 20px; border-radius: 12px; width: 250px; border-top: 6px solid #fff; }
+        .usa { border-color: #ef4444; }
+        .china { border-color: #eab308; }
+        .dinero { font-size: 1.5rem; color: #4ade80; font-weight: bold; margin: 10px 0; }
+        button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+        button:disabled { background: #475569; cursor: not-allowed; }
+        .alerta { background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 5px; margin-top: 10px; border-radius: 5px; display: none; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>Guerra Comercial Tycoon 🚢</h1>
+    <p>Produce, expande tus fábricas y domina la economía</p>
+    <div class="tablero">
+        <div class="card usa">
+            <h2>🇺🇸 EE. UU.</h2>
+            <div class="dinero" id="u-d">\$100</div>
+            <p>Nivel: <span id="u-n">1</span></p>
+            <button id="u-b" onclick="mejorar('usa')">Mejorar (\$50)</button>
+            <div class="alerta" id="u-a">⚠️ ¡Aranceles de China! (-40%)</div>
+        </div>
+        <div class="card china">
+            <h2>🇨🇳 China</h2>
+            <div class="dinero" id="c-d">¥100</div>
+            <p>Nivel: <span id="c-n">1</span></p>
+            <button id="c-b" onclick="mejorar('china')">Mejorar (¥50)</button>
+            <div class="alerta" id="c-a">⚠️ ¡Aranceles de EE.UU.! (-40%)</div>
+        </div>
+    </div>
+    <script>
+        let juego = {
+            usa: { dinero: 100, nivel: 1, coste: 50, arancel: false },
+            china: { dinero: 100, nivel: 1, coste: 50, arancel: false }
+        };
+        setInterval(() => {
+            let pU = juego.usa.nivel * 5;
+            if (juego.usa.arancel) pU = Math.round(pU * 0.6);
+            juego.usa.dinero += pU;
+            let pC = juego.china.nivel * 5;
+            if (juego.china.arancel) pC = Math.round(pC * 0.6);
+            juego.china.dinero += pC;
+            actualizar();
+        }, 2000);
+        setInterval(() => {
+            let azar = Math.random();
+            juego.usa.arancel = false; juego.china.arancel = false;
+            document.getElementById('u-a').style.display = 'none';
+            document.getElementById('c-a').style.display = 'none';
+            if (azar < 0.33) { juego.china.arancel = true; document.getElementById('c-a').style.display = 'block'; }
+            else if (azar < 0.66) { juego.usa.arancel = true; document.getElementById('u-a').style.display = 'block'; }
+            actualizar();
+        }, 10000);
+        function mejorar(pais) {
+            let p = juego[pais];
+            if (p.dinero >= p.coste) { p.dinero -= p.coste; p.nivel++; p.coste = Math.round(p.coste * 1.5); actualizar(); }
+        }
+        function actualizar() {
+            document.getElementById('u-d').innerText = `$${juego.usa.dinero}`;
+            document.getElementById('u-n').innerText = juego.usa.nivel;
+            document.getElementById('u-b').innerText = `Mejorar ($${juego.usa.coste})`;
+            document.getElementById('u-b').disabled = juego.usa.dinero < juego.usa.coste;
+            document.getElementById('c-d').innerText = `¥${juego.china.dinero}`;
+            document.getElementById('c-n').innerText = juego.china.nivel;
+            document.getElementById('c-b').innerText = `Mejorar (¥${juego.china.coste})`;
+            document.getElementById('c-b').disabled = juego.china.dinero < juego.china.coste;
+        }
+        actualizar();
+    </script>
+</body>
+</html>
 
